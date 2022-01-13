@@ -5,6 +5,20 @@ void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
 
+    const FString WordListPath = FPaths::ProjectContentDir()/TEXT("WordsList/HiddenWordsList.txt");
+    FFileHelper::LoadFileToStringArray(HiddenWords, *WordListPath);
+
+    PrintLine(TEXT("Number of possible words: %i"), HiddenWords.Num());
+
+    for (int32 i = 0; i < 10; i++)
+    {
+        int32 WordLen = HiddenWords[i].Len();
+        if (WordLen >= 4 && WordLen <= 8)
+        {
+            PrintLine(HiddenWords[i]);
+        }
+    }
+
     SetupGame();
     ShowPreview();
 }
@@ -79,7 +93,18 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
     }
 }
 
-bool UBullCowCartridge::IsIsogram(FString Word)
+bool UBullCowCartridge::IsIsogram(FString Word) const
 {
+    for (int32 Index = 0; Index < Word.Len() - 1; Index++)
+    {
+        for (int32 Comparison = Index + 1; Comparison < Word.Len(); Comparison++)
+        {
+            if (Word[Index] == Word[Comparison])
+            {
+                return false;
+            }
+        }
+    }
+
     return true;
 }
