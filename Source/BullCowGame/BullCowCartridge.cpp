@@ -5,15 +5,6 @@ void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
 
-    const FString WordListPath = FPaths::ProjectContentDir()/TEXT("WordsList/HiddenWordsList.txt");
-    FFileHelper::LoadFileToStringArray(HiddenWords, *WordListPath);
-
-    PrintLine(TEXT("Number of possible words: %i"), HiddenWords.Num());
-
-    TArray<FString> ValidHiddenWords = GetValidWords(HiddenWords);
-
-    PrintLine(TEXT("Number of possible valid words: %i"), ValidHiddenWords.Num());
-
     SetupGame();
     ShowPreview();
 }
@@ -35,7 +26,16 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
 
 void UBullCowCartridge::SetupGame()
 {
-    HiddenWord = TEXT("cakes");
+    const FString WordListPath = FPaths::ProjectContentDir()/TEXT("WordsList/HiddenWordsList.txt");
+    FFileHelper::LoadFileToStringArray(HiddenWords, *WordListPath);
+
+    PrintLine(TEXT("Number of possible words: %i"), HiddenWords.Num());
+
+    TArray<FString> ValidHiddenWords = GetValidWords(HiddenWords);
+
+    PrintLine(TEXT("Number of possible valid words: %i"), ValidHiddenWords.Num());
+
+    HiddenWord = ValidHiddenWords[FMath::RandRange(0, ValidHiddenWords.Num() - 1)];
     Lives = HiddenWord.Len();
     bGameOver = false;
 }
@@ -54,7 +54,7 @@ void UBullCowCartridge::EndGame()
     bGameOver = true;
 }
 
-void UBullCowCartridge::ProcessGuess(FString Guess)
+void UBullCowCartridge::ProcessGuess(const FString& Guess)
 {
     if (Guess == HiddenWord)
     {
@@ -88,7 +88,7 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
     }
 }
 
-bool UBullCowCartridge::IsIsogram(FString Word) const
+bool UBullCowCartridge::IsIsogram(const FString& Word) const
 {
     for (int32 Index = 0; Index < Word.Len() - 1; Index++)
     {
@@ -104,7 +104,7 @@ bool UBullCowCartridge::IsIsogram(FString Word) const
     return true;
 }
 
-TArray<FString> UBullCowCartridge::GetValidWords(TArray<FString> Words) const
+TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& Words) const
 {
     TArray<FString> ValidWords;
 
